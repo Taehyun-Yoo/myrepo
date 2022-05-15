@@ -1,4 +1,4 @@
-#Chapter 1_repo
+#Chapter 1
 #load needed packages
 library("Rcpp")
 library("rstanarm")
