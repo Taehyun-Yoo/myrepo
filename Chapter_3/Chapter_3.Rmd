@@ -1,0 +1,20 @@
+---
+title: "Chapter_3"
+author: "Taehyun Yoo"
+date: '2022-05-17'
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r packages, include = FALSE}
+#Load packages
+library("Rcpp")
+library("rstanarm")
+```
+
+# 3.3 Graphing a line
+```{r 3.3}
+curve(1007 - 0.393*x, from=1900, to=2000, xlab="Year", ylab="Time (seconds)",
+main="Approximate trend of world record times\nfor the mile run")
+```
