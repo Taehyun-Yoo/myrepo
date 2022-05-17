@@ -1,0 +1,24 @@
+---
+title: "Chapter_2"
+author: "Taehyun Yoo"
+date: '2022-05-17'
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r packages, include = FALSE}
+#Load packages
+library("Rcpp")
+library("rstanarm")
+```
+
+# 2.3 All graphs are comparisons
+```{r 2.3}
+health <- read.table("../../HealthExpenditure/data/healthdata.txt", header=TRUE)
+health
+
+country <- rownames(health)
+plot(health$spending, health$lifespan, type="n")
+text(health$spending, health$lifespan, country)
+```
