@@ -1,0 +1,41 @@
+---
+title: "Chapter_1"
+author: "Taehyun Yoo"
+date: '2022-05-17'
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r, include = FALSE}
+#Load packages
+library("Rcpp")
+library("rstanarm")
+```
+
+# 1.2 Why learn regression?
+```{r}
+hibbs <- read.table("../ElectionsEconomy/data/hibbs.dat", header=TRUE)
+hibbs
+
+plot(hibbs$growth, hibbs$vote, xlab="Average recent growth in personal income",
+     ylab="Incumbent party's vote share")
+
+M1 <- stan_glm(vote ~ growth, data=hibbs)
+abline(coef(M1), col="gray")
+```
+
+# 1.6 Computing least squares and Bayesian regression
+## Types of fitting
+```{r}
+#1:least squares regression
+fit1 <- lm(vote ~ growth, data = hibbs)
+fit1
+#2:maximum likelihood (maybe later)
+#3:Bayesian regression
+fit3 <- stan_glm(vote ~ growth, data=hibbs)
+fit3
+#3-1:running Bayesian regression faster using optimizing mode when dataset is large
+fit3_1 <- stan_glm(vote ~ growth, data=hibbs, algorithm = "optimizing")
+fit3_1
+```
