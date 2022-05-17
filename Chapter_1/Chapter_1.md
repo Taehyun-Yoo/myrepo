@@ -12,7 +12,7 @@ output:
 # 1.2 Why learn regression?
 
 ```r
-hibbs <- read.table("../ElectionsEconomy/data/hibbs.dat", header=TRUE)
+hibbs <- read.table("../../ElectionsEconomy/data/hibbs.dat", header=TRUE)
 hibbs
 ```
 
@@ -65,9 +65,9 @@ M1 <- stan_glm(vote ~ growth, data=hibbs)
 ## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 1: 
-## Chain 1:  Elapsed Time: 0.096 seconds (Warm-up)
-## Chain 1:                0.065 seconds (Sampling)
-## Chain 1:                0.161 seconds (Total)
+## Chain 1:  Elapsed Time: 0.128 seconds (Warm-up)
+## Chain 1:                0.063 seconds (Sampling)
+## Chain 1:                0.191 seconds (Total)
 ## Chain 1: 
 ## 
 ## SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
@@ -90,9 +90,9 @@ M1 <- stan_glm(vote ~ growth, data=hibbs)
 ## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 2: 
-## Chain 2:  Elapsed Time: 0.074 seconds (Warm-up)
-## Chain 2:                0.064 seconds (Sampling)
-## Chain 2:                0.138 seconds (Total)
+## Chain 2:  Elapsed Time: 0.07 seconds (Warm-up)
+## Chain 2:                0.073 seconds (Sampling)
+## Chain 2:                0.143 seconds (Total)
 ## Chain 2: 
 ## 
 ## SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
@@ -115,9 +115,9 @@ M1 <- stan_glm(vote ~ growth, data=hibbs)
 ## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 3: 
-## Chain 3:  Elapsed Time: 0.094 seconds (Warm-up)
-## Chain 3:                0.059 seconds (Sampling)
-## Chain 3:                0.153 seconds (Total)
+## Chain 3:  Elapsed Time: 0.076 seconds (Warm-up)
+## Chain 3:                0.083 seconds (Sampling)
+## Chain 3:                0.159 seconds (Total)
 ## Chain 3: 
 ## 
 ## SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
@@ -140,9 +140,9 @@ M1 <- stan_glm(vote ~ growth, data=hibbs)
 ## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 4: 
-## Chain 4:  Elapsed Time: 0.093 seconds (Warm-up)
-## Chain 4:                0.065 seconds (Sampling)
-## Chain 4:                0.158 seconds (Total)
+## Chain 4:  Elapsed Time: 0.095 seconds (Warm-up)
+## Chain 4:                0.056 seconds (Sampling)
+## Chain 4:                0.151 seconds (Total)
 ## Chain 4:
 ```
 
@@ -150,7 +150,7 @@ M1 <- stan_glm(vote ~ growth, data=hibbs)
 abline(coef(M1), col="gray")
 ```
 
-![](Chapter_1_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+![](Chapter_1_files/figure-html/1.2-1.png)<!-- -->
 
 # 1.6 Computing least squares and Bayesian regression
 ## Types of fitting
@@ -199,9 +199,9 @@ fit3 <- stan_glm(vote ~ growth, data=hibbs)
 ## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 1: 
-## Chain 1:  Elapsed Time: 0.083 seconds (Warm-up)
-## Chain 1:                0.09 seconds (Sampling)
-## Chain 1:                0.173 seconds (Total)
+## Chain 1:  Elapsed Time: 0.079 seconds (Warm-up)
+## Chain 1:                0.076 seconds (Sampling)
+## Chain 1:                0.155 seconds (Total)
 ## Chain 1: 
 ## 
 ## SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
@@ -224,9 +224,9 @@ fit3 <- stan_glm(vote ~ growth, data=hibbs)
 ## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 2: 
-## Chain 2:  Elapsed Time: 0.084 seconds (Warm-up)
-## Chain 2:                0.074 seconds (Sampling)
-## Chain 2:                0.158 seconds (Total)
+## Chain 2:  Elapsed Time: 0.071 seconds (Warm-up)
+## Chain 2:                0.062 seconds (Sampling)
+## Chain 2:                0.133 seconds (Total)
 ## Chain 2: 
 ## 
 ## SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
@@ -249,9 +249,9 @@ fit3 <- stan_glm(vote ~ growth, data=hibbs)
 ## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 3: 
-## Chain 3:  Elapsed Time: 0.104 seconds (Warm-up)
-## Chain 3:                0.086 seconds (Sampling)
-## Chain 3:                0.19 seconds (Total)
+## Chain 3:  Elapsed Time: 0.085 seconds (Warm-up)
+## Chain 3:                0.062 seconds (Sampling)
+## Chain 3:                0.147 seconds (Total)
 ## Chain 3: 
 ## 
 ## SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
@@ -274,9 +274,9 @@ fit3 <- stan_glm(vote ~ growth, data=hibbs)
 ## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 4: 
-## Chain 4:  Elapsed Time: 0.105 seconds (Warm-up)
-## Chain 4:                0.093 seconds (Sampling)
-## Chain 4:                0.198 seconds (Total)
+## Chain 4:  Elapsed Time: 0.073 seconds (Warm-up)
+## Chain 4:                0.066 seconds (Sampling)
+## Chain 4:                0.139 seconds (Total)
 ## Chain 4:
 ```
 
@@ -292,8 +292,8 @@ fit3
 ##  predictors:   2
 ## ------
 ##             Median MAD_SD
-## (Intercept) 46.2    1.7  
-## growth       3.1    0.7  
+## (Intercept) 46.3    1.6  
+## growth       3.0    0.7  
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
@@ -318,12 +318,12 @@ fit3_1
 ##  predictors:   2
 ## ------
 ##             Median MAD_SD
-## (Intercept) 46.2    1.5  
-## growth       3.0    0.7  
+## (Intercept) 46.4    1.7  
+## growth       3.1    0.7  
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 3.8    0.7   
+## sigma 3.9    0.8   
 ## 
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg

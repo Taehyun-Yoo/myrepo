@@ -7,15 +7,15 @@ output:
     keep_md: yes
 ---
 
-```{r, include = FALSE}
+```{r packages, include = FALSE}
 #Load packages
 library("Rcpp")
 library("rstanarm")
 ```
 
 # 1.2 Why learn regression?
-```{r}
-hibbs <- read.table("../ElectionsEconomy/data/hibbs.dat", header=TRUE)
+```{r 1.2}
+hibbs <- read.table("../../ElectionsEconomy/data/hibbs.dat", header=TRUE)
 hibbs
 
 plot(hibbs$growth, hibbs$vote, xlab="Average recent growth in personal income",
@@ -27,7 +27,7 @@ abline(coef(M1), col="gray")
 
 # 1.6 Computing least squares and Bayesian regression
 ## Types of fitting
-```{r}
+```{r 1.6}
 #1:least squares regression
 fit1 <- lm(vote ~ growth, data = hibbs)
 fit1
