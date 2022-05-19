@@ -11,18 +11,28 @@ output:
 #Load packages
 library("Rcpp")
 library("rstanarm")
+library('tidyverse')
+library('here')
+library("brms")
 ```
 
 # 1.2 Why learn regression?
 ```{r 1.2}
-hibbs <- read.table("../../ElectionsEconomy/data/hibbs.dat", header=TRUE)
+hibbs <- here("..", "ElectionsEconomy", "data", "hibbs.dat")
+hibbs <- read.table(hibbs, header = TRUE)
 hibbs
 
 plot(hibbs$growth, hibbs$vote, xlab="Average recent growth in personal income",
      ylab="Incumbent party's vote share")
 
-M1 <- stan_glm(vote ~ growth, data=hibbs)
-abline(coef(M1), col="gray")
+m1 <- brm(
+  vote ~ growth, 
+  data = hibbs
+)
+
+abline(a = M1[1,1], b = M1[2,1], col = "gray")
+#abline(coef = c(M1[1,1], M1[2,1]), col ="red")
+#abline(coef = M1[,1], col ="blue")
 ```
 
 # 1.6 Computing least squares and Bayesian regression
@@ -38,4 +48,7 @@ fit3
 #3-1:running Bayesian regression faster using optimizing mode when dataset is large
 fit3_1 <- stan_glm(vote ~ growth, data=hibbs, algorithm = "optimizing")
 fit3_1
+#3-2:bayesian regression (with brms)
+fit3_2 <- brm(vote ~ growth, data = hibbs)
+fit3_2
 ```

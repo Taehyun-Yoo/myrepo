@@ -11,6 +11,9 @@ output:
 #Load packages
 library("Rcpp")
 library("rstanarm")
+library('tidyverse')
+library('here')
+library("brms")
 ```
 
 # 3.3 Graphing a line

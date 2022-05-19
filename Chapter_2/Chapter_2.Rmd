@@ -11,6 +11,9 @@ output:
 #Load packages
 library("Rcpp")
 library("rstanarm")
+library('tidyverse')
+library('here')
+library("brms")
 ```
 
 # 2.3 All graphs are comparisons
@@ -21,4 +24,22 @@ health
 country <- rownames(health)
 plot(health$spending, health$lifespan, type="n")
 text(health$spending, health$lifespan, country)
+```
+
+# extra) Model fitting
+```{r model fitting}
+m1 <- brm(
+  lifespan ~ spending, 
+  data = health
+)
+
+M1 <-fixef(m1)
+# plot(
+#   health$lifespan, 
+#   health$spending, 
+#   xlab="Average recent growth in personal income",
+#   ylab="Incumbent party's vote share"
+# )
+
+abline(a = M1[1,1], b = M1[2,1], col = "gray")
 ```
