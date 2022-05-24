@@ -30,6 +30,9 @@ m1 <- brm(
   data = hibbs
 )
 
+M1 <- fixef(m1)
+M1
+
 abline(a = M1[1,1], b = M1[2,1], col = "gray")
 #abline(coef = c(M1[1,1], M1[2,1]), col ="red")
 #abline(coef = M1[,1], col ="blue")

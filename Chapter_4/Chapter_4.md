@@ -12,8 +12,8 @@ output:
 # 4.2 Estimates, standard errors, and confidence intervals
 
 ```r
-y = 40
-n = 100
+y <- 40
+n <- 100
 estimate <- y/n
 
 se <- sqrt(estimate*(1-estimate)/n)

@@ -372,7 +372,8 @@ pre code {
 
 <div id="why-learn-regression" class="section level1">
 <h1>1.2 Why learn regression?</h1>
-<pre class="r"><code>hibbs &lt;- read.table(&quot;../../ElectionsEconomy/data/hibbs.dat&quot;, header=TRUE)
+<pre class="r"><code>hibbs &lt;- here(&quot;..&quot;, &quot;ElectionsEconomy&quot;, &quot;data&quot;, &quot;hibbs.dat&quot;)
+hibbs &lt;- read.table(hibbs, header = TRUE)
 hibbs</code></pre>
 <pre><code>##    year growth  vote inc_party_candidate other_candidate
 ## 1  1952   2.40 44.60           Stevenson      Eisenhower
@@ -394,9 +395,14 @@ hibbs</code></pre>
 <pre class="r"><code>plot(hibbs$growth, hibbs$vote, xlab=&quot;Average recent growth in personal income&quot;,
      ylab=&quot;Incumbent party&#39;s vote share&quot;)
 
-M1 &lt;- stan_glm(vote ~ growth, data=hibbs)</code></pre>
+m1 &lt;- brm(
+  vote ~ growth, 
+  data = hibbs
+)</code></pre>
+<pre><code>## Compiling Stan program...</code></pre>
+<pre><code>## Start sampling</code></pre>
 <pre><code>## 
-## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 1).
+## SAMPLING FOR MODEL &#39;2a34e405a032f5f810ea9b5e8efaa185&#39; NOW (CHAIN 1).
 ## Chain 1: 
 ## Chain 1: Gradient evaluation took 0 seconds
 ## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
@@ -416,12 +422,12 @@ M1 &lt;- stan_glm(vote ~ growth, data=hibbs)</code></pre>
 ## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 1: 
-## Chain 1:  Elapsed Time: 0.128 seconds (Warm-up)
-## Chain 1:                0.063 seconds (Sampling)
-## Chain 1:                0.191 seconds (Total)
+## Chain 1:  Elapsed Time: 0.066 seconds (Warm-up)
+## Chain 1:                0.073 seconds (Sampling)
+## Chain 1:                0.139 seconds (Total)
 ## Chain 1: 
 ## 
-## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 2).
+## SAMPLING FOR MODEL &#39;2a34e405a032f5f810ea9b5e8efaa185&#39; NOW (CHAIN 2).
 ## Chain 2: 
 ## Chain 2: Gradient evaluation took 0 seconds
 ## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
@@ -441,12 +447,12 @@ M1 &lt;- stan_glm(vote ~ growth, data=hibbs)</code></pre>
 ## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 2: 
-## Chain 2:  Elapsed Time: 0.07 seconds (Warm-up)
-## Chain 2:                0.073 seconds (Sampling)
-## Chain 2:                0.143 seconds (Total)
+## Chain 2:  Elapsed Time: 0.073 seconds (Warm-up)
+## Chain 2:                0.077 seconds (Sampling)
+## Chain 2:                0.15 seconds (Total)
 ## Chain 2: 
 ## 
-## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 3).
+## SAMPLING FOR MODEL &#39;2a34e405a032f5f810ea9b5e8efaa185&#39; NOW (CHAIN 3).
 ## Chain 3: 
 ## Chain 3: Gradient evaluation took 0 seconds
 ## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
@@ -466,12 +472,12 @@ M1 &lt;- stan_glm(vote ~ growth, data=hibbs)</code></pre>
 ## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 3: 
-## Chain 3:  Elapsed Time: 0.076 seconds (Warm-up)
-## Chain 3:                0.083 seconds (Sampling)
-## Chain 3:                0.159 seconds (Total)
+## Chain 3:  Elapsed Time: 0.07 seconds (Warm-up)
+## Chain 3:                0.067 seconds (Sampling)
+## Chain 3:                0.137 seconds (Total)
 ## Chain 3: 
 ## 
-## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 4).
+## SAMPLING FOR MODEL &#39;2a34e405a032f5f810ea9b5e8efaa185&#39; NOW (CHAIN 4).
 ## Chain 4: 
 ## Chain 4: Gradient evaluation took 0 seconds
 ## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
@@ -491,12 +497,16 @@ M1 &lt;- stan_glm(vote ~ growth, data=hibbs)</code></pre>
 ## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 4: 
-## Chain 4:  Elapsed Time: 0.095 seconds (Warm-up)
-## Chain 4:                0.056 seconds (Sampling)
-## Chain 4:                0.151 seconds (Total)
+## Chain 4:  Elapsed Time: 0.078 seconds (Warm-up)
+## Chain 4:                0.058 seconds (Sampling)
+## Chain 4:                0.136 seconds (Total)
 ## Chain 4:</code></pre>
-<pre class="r"><code>abline(coef(M1), col=&quot;gray&quot;)</code></pre>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<pre class="r"><code>M1 &lt;-fixef(m1)
+
+abline(a = M1[1,1], b = M1[2,1], col = &quot;gray&quot;)</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<pre class="r"><code>#abline(coef = c(M1[1,1], M1[2,1]), col =&quot;red&quot;)
+#abline(coef = M1[,1], col =&quot;blue&quot;)</code></pre>
 </div>
 <div id="computing-least-squares-and-bayesian-regression" class="section level1">
 <h1>1.6 Computing least squares and Bayesian regression</h1>
@@ -518,8 +528,8 @@ fit3 &lt;- stan_glm(vote ~ growth, data=hibbs)</code></pre>
 <pre><code>## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 1).
 ## Chain 1: 
-## Chain 1: Gradient evaluation took 0 seconds
-## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+## Chain 1: Gradient evaluation took 0.002 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
 ## Chain 1: Adjust your expectations accordingly!
 ## Chain 1: 
 ## Chain 1: 
@@ -536,9 +546,9 @@ fit3 &lt;- stan_glm(vote ~ growth, data=hibbs)</code></pre>
 ## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 1: 
-## Chain 1:  Elapsed Time: 0.079 seconds (Warm-up)
-## Chain 1:                0.076 seconds (Sampling)
-## Chain 1:                0.155 seconds (Total)
+## Chain 1:  Elapsed Time: 0.111 seconds (Warm-up)
+## Chain 1:                0.097 seconds (Sampling)
+## Chain 1:                0.208 seconds (Total)
 ## Chain 1: 
 ## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 2).
@@ -561,9 +571,9 @@ fit3 &lt;- stan_glm(vote ~ growth, data=hibbs)</code></pre>
 ## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 2: 
-## Chain 2:  Elapsed Time: 0.071 seconds (Warm-up)
-## Chain 2:                0.062 seconds (Sampling)
-## Chain 2:                0.133 seconds (Total)
+## Chain 2:  Elapsed Time: 0.12 seconds (Warm-up)
+## Chain 2:                0.09 seconds (Sampling)
+## Chain 2:                0.21 seconds (Total)
 ## Chain 2: 
 ## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 3).
@@ -586,9 +596,9 @@ fit3 &lt;- stan_glm(vote ~ growth, data=hibbs)</code></pre>
 ## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 3: 
-## Chain 3:  Elapsed Time: 0.085 seconds (Warm-up)
-## Chain 3:                0.062 seconds (Sampling)
-## Chain 3:                0.147 seconds (Total)
+## Chain 3:  Elapsed Time: 0.123 seconds (Warm-up)
+## Chain 3:                0.1 seconds (Sampling)
+## Chain 3:                0.223 seconds (Total)
 ## Chain 3: 
 ## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 4).
@@ -611,9 +621,9 @@ fit3 &lt;- stan_glm(vote ~ growth, data=hibbs)</code></pre>
 ## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 4: 
-## Chain 4:  Elapsed Time: 0.073 seconds (Warm-up)
-## Chain 4:                0.066 seconds (Sampling)
-## Chain 4:                0.139 seconds (Total)
+## Chain 4:  Elapsed Time: 0.128 seconds (Warm-up)
+## Chain 4:                0.103 seconds (Sampling)
+## Chain 4:                0.231 seconds (Total)
 ## Chain 4:</code></pre>
 <pre class="r"><code>fit3</code></pre>
 <pre><code>## stan_glm
@@ -623,7 +633,7 @@ fit3 &lt;- stan_glm(vote ~ growth, data=hibbs)</code></pre>
 ##  predictors:   2
 ## ------
 ##             Median MAD_SD
-## (Intercept) 46.3    1.6  
+## (Intercept) 46.3    1.7  
 ## growth       3.0    0.7  
 ## 
 ## Auxiliary parameter(s):
@@ -643,16 +653,141 @@ fit3_1</code></pre>
 ##  predictors:   2
 ## ------
 ##             Median MAD_SD
-## (Intercept) 46.4    1.7  
-## growth       3.1    0.7  
+## (Intercept) 46.3    1.7  
+## growth       3.0    0.8  
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 3.9    0.8   
+## sigma 3.8    0.7   
 ## 
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+<pre class="r"><code>#3-2:bayesian regression (with brms)
+fit3_2 &lt;- brm(vote ~ growth, data = hibbs)</code></pre>
+<pre><code>## Compiling Stan program...</code></pre>
+<pre><code>## recompiling to avoid crashing R session</code></pre>
+<pre><code>## Start sampling</code></pre>
+<pre><code>## 
+## SAMPLING FOR MODEL &#39;2a34e405a032f5f810ea9b5e8efaa185&#39; NOW (CHAIN 1).
+## Chain 1: 
+## Chain 1: Gradient evaluation took 0 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+## Chain 1: Adjust your expectations accordingly!
+## Chain 1: 
+## Chain 1: 
+## Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 1: 
+## Chain 1:  Elapsed Time: 0.071 seconds (Warm-up)
+## Chain 1:                0.052 seconds (Sampling)
+## Chain 1:                0.123 seconds (Total)
+## Chain 1: 
+## 
+## SAMPLING FOR MODEL &#39;2a34e405a032f5f810ea9b5e8efaa185&#39; NOW (CHAIN 2).
+## Chain 2: 
+## Chain 2: Gradient evaluation took 0 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+## Chain 2: Adjust your expectations accordingly!
+## Chain 2: 
+## Chain 2: 
+## Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 2: 
+## Chain 2:  Elapsed Time: 0.062 seconds (Warm-up)
+## Chain 2:                0.061 seconds (Sampling)
+## Chain 2:                0.123 seconds (Total)
+## Chain 2: 
+## 
+## SAMPLING FOR MODEL &#39;2a34e405a032f5f810ea9b5e8efaa185&#39; NOW (CHAIN 3).
+## Chain 3: 
+## Chain 3: Gradient evaluation took 0 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+## Chain 3: Adjust your expectations accordingly!
+## Chain 3: 
+## Chain 3: 
+## Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 3: 
+## Chain 3:  Elapsed Time: 0.06 seconds (Warm-up)
+## Chain 3:                0.055 seconds (Sampling)
+## Chain 3:                0.115 seconds (Total)
+## Chain 3: 
+## 
+## SAMPLING FOR MODEL &#39;2a34e405a032f5f810ea9b5e8efaa185&#39; NOW (CHAIN 4).
+## Chain 4: 
+## Chain 4: Gradient evaluation took 0 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+## Chain 4: Adjust your expectations accordingly!
+## Chain 4: 
+## Chain 4: 
+## Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 4: 
+## Chain 4:  Elapsed Time: 0.067 seconds (Warm-up)
+## Chain 4:                0.054 seconds (Sampling)
+## Chain 4:                0.121 seconds (Total)
+## Chain 4:</code></pre>
+<pre class="r"><code>fit3_2</code></pre>
+<pre><code>##  Family: gaussian 
+##   Links: mu = identity; sigma = identity 
+## Formula: vote ~ growth 
+##    Data: hibbs (Number of observations: 16) 
+##   Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+##          total post-warmup draws = 4000
+## 
+## Population-Level Effects: 
+##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## Intercept    46.16      1.73    42.76    49.49 1.00     3030     2361
+## growth        3.08      0.76     1.59     4.56 1.00     2934     2203
+## 
+## Family Specific Parameters: 
+##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## sigma     4.04      0.82     2.80     5.97 1.00     3155     2311
+## 
+## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+## and Tail_ESS are effective sample size measures, and Rhat is the potential
+## scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
 
