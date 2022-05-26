@@ -47,3 +47,19 @@ congress <- read.csv(congress)
 congress
 hist(congress$v88, breaks = 20)
 
+data88 <- data.frame(vote=congress$v88_adj, past_vote=congress$v86_adj,
+                     inc=congress$inc88)
+fit88 <- brm(vote ~ past_vote + inc, data=data88)
+
+data90 <- data.frame(past_vote=congress$v88_adj, inc=congress$inc90)
+pred90 <- posterior_predict(fit88, newdata=data90)
+n_sims <- nrow(sims88)
+
+dems_pred <- rowSums(pred90 > 0.5)
+dems_pred <- rep(NA, n_sims)
+for (s in 1:n_sims) {
+  dems_pred[s] <- sum(pred90[s,] > 0.5)
+}
+
+fit4 <- brm(kid_score ~ mom_hs + mom_iq + mom_hs:mom_iq, data=kidiq)
+
