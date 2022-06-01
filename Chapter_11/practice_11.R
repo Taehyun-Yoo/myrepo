@@ -4,6 +4,8 @@ library('tidyverse')
 library('here')
 library("brms")
 library("haven")
+library("loo")
+library("MASS")
 
 kidiq <- here("..", "KidIQ", "data", "kidiq.csv")
 kidiq <- read.csv(kidiq)
@@ -115,3 +117,133 @@ introclass$final_fake <- a + b*introclass$midterm + rnorm(n, 0, sigma)
 fit_fake <- brm(final_fake ~ midterm, data=introclass)
 sims <- as.matrix(fit_fake)
 predicted_fake <- colMeans(sims[,1] + sims[,2] %*% t(introclass$midterm))
+
+newcomb <- here("..", "newcomb", "data", "newcomb.txt")
+newcomb <- read.table(newcomb, header = TRUE)
+newcomb
+
+fit <- brm(y ~ 1, data=newcomb)
+
+sims <- as.matrix(fit)
+n_sims <- nrow(sims)
+n <- length(newcomb$y)
+y_rep <- array(NA, c(n_sims, n))
+for (s in 1:n_sims) {
+  y_rep[s,] <- rnorm(n, sims[s,1], sims[s,2])
+}
+#y_rep <- posterior_predict(fit)
+
+par(mfrow=c(5,4))
+for (s in sample(n_sims, 20)) {
+  hist(y_rep[s,])
+}
+
+test <- function(y) {
+  min(y)
+}
+test_rep <- apply(y_rep, 1, test)
+
+hist(test_rep, xlim=range(test(y), test_rep))
+lines(rep(test(y),2), c(0,n))
+
+unemp <- here("..", "Unemployment", "data", "unemp.txt")
+unemp <- read.table(unemp, header = TRUE)
+unemp
+
+n <- nrow(unemp)
+unemp$y_lag <- c(NA, unemp$y[1:(n-1)])
+fit_lag <- brm(y ~ y_lag, data=unemp)
+sims <- as.matrix(fit_lag)
+n_sims <- nrow(sims)
+y <- unemp$y
+y_rep <- array(NA, c(n_sims, n))
+
+for (s in 1:n_sims){
+  y_rep[s,1] <- y[1]
+  for (t in 2:n){
+    y_rep[s,t] <- sims[s,"b_Intercept"] + sims[s,"b_y_lag"] * y_rep[s,t-1] +
+      rnorm(1, 0, sims[s,"sigma"])
+  }
+}
+
+test <- function(y){
+  n <- length(y)
+  y_lag <- c(NA, y[1:(n-1)])
+  y_lag_2 <- c(NA, NA, y[1:(n-2)])
+  sum(sign(y-y_lag) != sign(y_lag-y_lag_2), na.rm=TRUE)
+}
+
+test_y <- test(unemp$y)
+test_rep <- apply(y_rep, 1, test)
+
+#calculate R2
+fit__1 <- brm(kid_score ~ mom_hs + mom_iq, data = kidiq)
+rss <- sum((kidiq$kid_score - (fixef(fit__1)[1,1] + fixef(fit__1)[2,1]*kidiq$mom_hs + fixef(fit__1)[3,1]*kidiq$mom_iq)) ^ 2)  ## residual sum of squares
+tss <- sum((kidiq$kid_score - mean(kidiq$kid_score)) ^ 2)  ## total sum of squares
+rsq <- 1 - rss/tss
+
+fit__2 <- lm(kid_score ~ mom_hs, data = kidiq)
+squares_of_cor <- cor(kidiq$kid_score,kidiq$mom_hs)^2
+
+x <- 1:5 - 3
+y <- c(1.7, 2.6, 2.5, 4.4, 3.8) - 3
+xy <- data.frame(x,y)
+
+fit <- lm(y ~ x, data = xy)
+ols_coef <- coef(fit)
+yhat <- ols_coef[1] + ols_coef[2] * x
+r <- y - yhat
+rsq_1 <- var(yhat)/(var(y))
+rsq_2 <- var(yhat)/(var(yhat) + var(r))
+round(c(rsq_1, rsq_2), 3)
+fit2 <- stan_glm(y ~ x, data = xy)
+fit3 <- stan_glm(y ~ x, data = xy, prior=normal(1, 0.2), prior_intercept=normal(0, 0.2))
+median(bayes_R2(fit2))
+
+n <- 20
+x <- 1:n
+a <- 0.2
+b <- 0.3
+sigma <- 1
+set.seed(2141)
+y <- a + b*x + sigma*rnorm(n)
+fake <- data.frame(x, y)
+fit_all <- brm(y ~ x, data = fake)
+fit_minus_18 <- brm(y ~ x, data = fake[-18,])
+
+n <- nrow(kidiq)
+kidiqr <- kidiq
+kidiqr$noise <- array(rnorm(5*n), c(n,5))
+fit_3 <- brm(kid_score ~ mom_hs + mom_iq + noise, data=kidiqr)
+
+loo_3 <- loo(fit_3)
+print(loo_3)
+
+fit_1 <- brm(kid_score ~ mom_hs, data=kidiq)
+loo_1 <- loo(fit_1)
+print(loo_1)
+
+loo_compare(loo_3, loo_1)
+
+fit_4 <- brm(kid_score ~ mom_hs + mom_iq + mom_hs:mom_iq, data=kidiq)
+loo_4 <- loo(fit_4)
+
+loo_compare(loo_3, loo_4)
+
+k <- 30
+rho <- 0.8
+Sigma <- rho*array(1, c(k,k)) + (1-rho)*diag(k)
+X <- mvrnorm(n, rep(0,k), Sigma)
+b <- c(c(-1,1,2), rep(0, k-3))
+y <- X %*% b + 2*rnorm(n)
+fake <- data.frame(X, y)
+
+fit_1 <- stan_glm(y ~ ., prior=normal(0, 10), data=fake)
+loo_1 <- loo(fit_1)
+
+kfold_1 <- kfold(fit_1, K=10)
+print(kfold_1)
+
+fit_2 <- update(fit_2, prior=hs())
+kfold_2 <- kfold(fit_2, K=10)
+loo_compare(kfold_1, kfold_2)

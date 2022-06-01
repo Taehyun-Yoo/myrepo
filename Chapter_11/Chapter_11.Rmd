@@ -15,6 +15,8 @@ library('tidyverse')
 library('here')
 library("brms")
 library("haven")
+library("loo")
+library("MASS")
 ```
 
 #11.2 Plotting the data and fitted model
@@ -106,7 +108,12 @@ theta <- 5
 sigma <- 2
 y <- a + X %*% b + theta*z + rnorm(N, 0, sigma)
 fake <- data.frame(X=X, y=y, z=z)
-#fit <- brm(y ~ X[,1] + z, data=fake)
+#fake_list <- list(
+#  X = X,
+#  y = y,
+#  z = z
+#)
+#fit <- brm(y ~ X + z, data = data.frame(y = y, z = z), data2=list(X = X))
 fit <- stan_glm(y ~ X + z, data=fake)
 y_hat <- predict(fit)
 par(mfrow=c(1,2))
@@ -120,7 +127,7 @@ for (i in 0:1){
 #11.3 Residual plots
 ```{r 11.3}
 introclass <- here("..", "Introclass", "data", "gradesW4315.dat")
-introclass <- read.table(introclass, head = TRUE)
+introclass <- read.table(introclass, header = TRUE)
 introclass
 
 fit_1 <- brm(final ~ midterm, data=introclass)
@@ -139,4 +146,122 @@ introclass$final_fake <- a + b*introclass$midterm + rnorm(n, 0, sigma)
 fit_fake <- brm(final_fake ~ midterm, data=introclass)
 sims <- as.matrix(fit_fake)
 predicted_fake <- colMeans(sims[,1] + sims[,2] %*% t(introclass$midterm))
+```
+
+#11.4 Comparing data to replications from a fitted model
+```{r 11.4}
+newcomb <- here("..", "newcomb", "data", "newcomb.txt")
+newcomb <- read.table(newcomb, header = TRUE)
+newcomb
+
+fit <- brm(y ~ 1, data=newcomb)
+
+sims <- as.matrix(fit)
+n_sims <- nrow(sims)
+n <- length(newcomb$y)
+y_rep <- array(NA, c(n_sims, n))
+for (s in 1:n_sims) {
+  y_rep[s,] <- rnorm(n, sims[s,1], sims[s,2])
+}
+
+#par(mfrow=c(5,4))
+#for (s in sample(n_sims, 20)) {
+#  hist(y_rep[s,])
+#}
+
+#test <- function(y) {
+#  min(y)
+#}
+#test_rep <- apply(y_rep, 1, test)
+
+#hist(test_rep, xlim=range(test(y), test_rep))
+#lines(rep(test(y),2), c(0,n))
+```
+
+#11.5 Example: predictive simulation to check the fit of a time-series model
+```{r 11.5}
+unemp <- here("..", "Unemployment", "data", "unemp.txt")
+unemp <- read.table(unemp, header = TRUE)
+unemp
+
+n <- nrow(unemp)
+unemp$y_lag <- c(NA, unemp$y[1:(n-1)])
+fit_lag <- brm(y ~ y_lag, data=unemp)
+sims <- as.matrix(fit_lag)
+n_sims <- nrow(sims)
+y <- unemp$y
+y_rep <- array(NA, c(n_sims, n))
+
+for (s in 1:n_sims){
+  y_rep[s,1] <- y[1]
+  for (t in 2:n){
+    y_rep[s,t] <- sims[s,"b_Intercept"] + sims[s,"b_y_lag"] * y_rep[s,t-1] +
+      rnorm(1, 0, sims[s,"sigma"])
+  }
+}
+
+test <- function(y){
+  n <- length(y)
+  y_lag <- c(NA, y[1:(n-1)])
+  y_lag_2 <- c(NA, NA, y[1:(n-2)])
+  sum(sign(y-y_lag) != sign(y_lag-y_lag_2), na.rm=TRUE)
+}
+
+test_y <- test(unemp$y)
+test_rep <- apply(y_rep, 1, test)
+```
+
+#11.6 Residual standard deviation σ and explained variance R2
+```{r 11.6}
+fit_r2_1 <- brm(kid_score ~ mom_hs + mom_iq, data = kidiq)
+rss <- sum((kidiq$kid_score - (fixef(fit_r2_1)[1,1] + fixef(fit_r2_1)[2,1]*kidiq$mom_hs + fixef(fit_r2_1)[3,1]*kidiq$mom_iq)) ^ 2)  
+tss <- sum((kidiq$kid_score - mean(kidiq$kid_score)) ^ 2)  
+rsq <- 1 - rss/tss
+
+fit_r2_2 <- lm(kid_score ~ mom_hs, data = kidiq)
+squares_of_cor <- cor(kidiq$kid_score,kidiq$mom_hs)^2
+
+x <- 1:5 - 3
+y <- c(1.7, 2.6, 2.5, 4.4, 3.8) - 3
+xy <- data.frame(x,y)
+
+fit_br2_1 <- lm(y ~ x, data = xy)
+ols_coef <- coef(fit_br2_1)
+yhat <- ols_coef[1] + ols_coef[2] * x
+r <- y - yhat
+rsq_1 <- var(yhat)/(var(y))
+rsq_2 <- var(yhat)/(var(yhat) + var(r))
+round(c(rsq_1, rsq_2), 3)
+fit_br2_2 <- stan_glm(y ~ x, data = xy)
+fit_br2_3 <- stan_glm(y ~ x, data = xy, prior=normal(1, 0.2), prior_intercept=normal(0, 0.2))
+```
+
+#11.8 Cross validation
+```{r 11.8}
+n <- 20
+x <- 1:n
+a <- 0.2
+b <- 0.3
+sigma <- 1
+set.seed(2141)
+y <- a + b*x + sigma*rnorm(n)
+fake <- data.frame(x, y)
+
+k <- 30
+rho <- 0.8
+Sigma <- rho*array(1, c(k,k)) + (1-rho)*diag(k)
+X <- mvrnorm(n, rep(0,k), Sigma)
+b <- c(c(-1,1,2), rep(0, k-3))
+y <- X %*% b + 2*rnorm(n)
+fake <- data.frame(X, y)
+
+fit_1 <- stan_glm(y ~ ., prior=normal(0, 10), data=fake)
+loo_1 <- loo(fit_1)
+
+kfold_1 <- kfold(fit_1, K=10)
+print(kfold_1)
+
+fit_2 <- update(fit_2, prior=hs())
+kfold_2 <- kfold(fit_2, K=10)
+loo_compare(kfold_1, kfold_2)
 ```

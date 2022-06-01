@@ -42,19 +42,19 @@ print(cbind(Median, MAD_SD))
 ```{r 9.2}
 new <- data.frame(growth=2.0)
 
-#Point prediction uisng predict
+#1:Point prediction uisng predict
 y_point_pred <- predict(M1, newdata=new)
 #a_hat <- fixef(M1)[1,1]
 #b_hat <- fixef(M1)[2,1]
 #y_point_pred <- a_hat + b_hat*new
 
-#Linear predictor with uncertainty using posterior linpred or posterior epred
+#2:Linear predictor with uncertainty using posterior linpred or posterior epred
 y_linpred <- posterior_linpred(M1, newdata=new)
 a <- sims[,1]
 b <- sims[,2]
 #y_linpred <- a + b*new
 
-#Predictive distribution for a new distribution using posterior predict
+#3:Predictive distribution for a new distribution using posterior predict
 y_pred <- posterior_predict(M1, newdata=new)
 n_sims <- nrow(sims)
 sigma <- sims[,3]

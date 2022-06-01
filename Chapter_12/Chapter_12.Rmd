@@ -1,0 +1,62 @@
+---
+title: "Chapter_12"
+author: "Taehyun Yoo"
+date: '2022-06-01'
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r packages, include = FALSE}
+#Load packages
+library("Rcpp")
+library("rstanarm")
+library('tidyverse')
+library('here')
+library("brms")
+```
+
+#12.1 Linear transformations
+```{r 12.1}
+earnings <- here("..", "Earnings", "data", "earnings.csv")
+earnings <- read.csv(earnings)
+earnings
+
+#raw_data
+fit1 <- brm(earn ~ height, data=earnings)
+rss <- sum((earnings$earn - (fixef(fit1)[1,1] + fixef(fit1)[2,1]*earnings$height)) ^ 2, na.rm = TRUE)
+rsd <- sqrt(rss/(length(earnings[,1])-length(fixef(fit1)[,1])-1))
+
+#standardization example
+earnings$z_height <- (earnings$height - mean(earnings$height))/sd(earnings$height)
+fit2 <- brm(earn ~ z_height, data = earnings)
+```
+
+#12.2 Centering and standardizing for models with interactions
+```{r 12.2}
+kidiq <- here("..", "KidIQ", "data", "kidiq.csv")
+kidiq <- read.csv(kidiq)
+kidiq
+#no standardization
+fit3 <- brm(kid_score ~ mom_hs + mom_iq + mom_hs:mom_iq, data=kidiq)
+
+#1:Centering by subtracting the mean of the data
+kidiq$c_mom_hs <- kidiq$mom_hs - mean(kidiq$mom_hs)
+kidiq$c_mom_iq <- kidiq$mom_iq - mean(kidiq$mom_iq)
+fit4 <- brm(kid_score ~ c_mom_hs + c_mom_iq + c_mom_hs:c_mom_iq, data=kidiq)
+
+#2:Using a conventional centering point
+kidiq$c2_mom_hs <- kidiq$mom_hs - 0.5
+kidiq$c2_mom_iq <- kidiq$mom_iq - 100
+fit5 <-brm(kid_score ~ c2_mom_hs + c2_mom_iq + c2_mom_hs:c2_mom_iq, data=kidiq)
+
+#3:Standardizing by subtracting the mean and dividing by 2 standard deviations
+kidiq$z_mom_hs <- (kidiq$mom_hs - mean(kidiq$mom_hs))/(2*sd(kidiq$mom_hs))
+kidiq$z_mom_iq <- (kidiq$mom_iq - mean(kidiq$mom_iq))/(2*sd(kidiq$mom_iq))
+fit6 <-brm(kid_score ~ z_mom_hs + z_mom_iq + z_mom_hs:z_mom_iq, data=kidiq)
+```
+
+#12.4 Logarithmic transformations
+```{r 12.4}
+
+```
