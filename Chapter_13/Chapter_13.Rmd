@@ -1,0 +1,144 @@
+---
+title: "Chapeter_13"
+author: "Taehyun Yoo"
+date: '2022-06-11'
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r packages, include = FALSE}
+#Load packages
+library("Rcpp")
+library("rstanarm")
+library('tidyverse')
+library('here')
+library("brms")
+library("arm")
+library("loo")
+```
+
+#13.1 Logistic regression with a single predictor
+```{r 13.1}
+logit <- qlogis
+invlogit <- plogis
+
+nes92 <- here("..", "NES", "data", "nes.txt")
+nes92 <- read.table(nes92)
+nes92 <- subset(nes92, nes92$year == 1992)
+nes92
+
+fit_1 <- stan_glm(rvote ~ income, family=binomial(link="logit"), data=nes92)
+print(fit_1)
+
+#fit_1_brm <- brm(rvote ~ income, family=bernoulli(link="logit"), data=nes92)
+
+sims_1 <- as.matrix(fit_1)
+n_sims <- nrow(sims_1)
+for (j in sample(n_sims, 20)){
+  curve(invlogit(sims_1[j,1] + sims_1[j,2]*x), col="gray", lwd=0.5, add=TRUE)
+}
+```
+
+#13.3 Predictions and comparisons
+```{r 13.3}
+#1:Point prediction uisng predict
+new <- data.frame(income=5)
+pred <- predict(fit_1, type="response", newdata=new)
+invlogit(predict(fit_1, type="link", newdata=new))
+
+#2:Linear predictor with uncertainty using posterior_linpred
+linpred <- posterior_linpred(fit_1, newdata=new)
+
+#3:Expected outcome with uncertainty using posterior_epred
+epred <- posterior_epred(fit_1, newdata=new)
+print(c(mean(epred), sd(epred)))
+
+#4:Predictive distribution for a new observation using posterior_predict
+postpred <- posterior_predict(fit_1, newdata=new)
+
+new <- data.frame(income=1:5)
+pred <- predict(fit_1, type="response", newdata=new)
+linpred <- posterior_linpred(fit_1, newdata=new)
+epred <- posterior_epred(fit_1, newdata=new)
+postpred <- posterior_predict(fit_1, newdata=new)
+
+mean(epred[,5] - epred[,4])
+quantile(epred[,5] - epred[,4], c(0.025, 0.975))
+
+total <- apply(postpred, 1, sum)
+mean(total >= 3)
+
+y <- rep(c(0, 1), c(40, 10))
+simple <- data.frame(y)
+fit <- stan_glm(y ~ 1, family=binomial(link="logit"), data=simple)
+
+new <- data.frame(x=0)
+epred <- posterior_epred(fit, newdata=new)
+print(c(mean(epred), sd(epred)))
+```
+
+#13.5 Maximum likelihood and Bayesian inference for logistic regression
+```{r 13.5}
+bayes_sim <- function(n, a=-2, b=0.8){
+  x <- runif(n, -1, 1)
+  z <- rlogis(n, a + b*x, 1)
+  y <- ifelse(z>0, 1, 0)
+  fake <- data.frame(x, y, z)
+  glm_fit <- glm(y ~ x, family=binomial(link="logit"), data=fake)
+  stan_glm_fit <- stan_glm(y ~ x, family=binomial(link="logit"), data=fake,
+                           prior=normal(0.5, 0.5))
+  display(glm_fit, digits=1)
+  print(stan_glm_fit, digits=1)
+}
+
+bayes_sim(0)
+bayes_sim(10)
+bayes_sim(100)
+bayes_sim(1000)
+```
+
+#13.6 Cross validation and log score for logistic regression
+```{r 13.6}
+fit_1a <- stan_glm(rvote ~ 1, family=binomial(link="logit"), data=nes92)
+predp_1a <- predict(fit_1a, type="response")
+y <- nes92$rvote
+#logscore_1a <- sum(y*log(predp_1a) + (1-y)*log(1 - predp_1a))
+
+fit_1 <- stan_glm(rvote ~ income, family=binomial(link="logit"), data=nes92)
+predp_1 <- predict(fit_1, type="response")
+#logscore_1 <- sum(y*log(predp_1) + (1-y)*log(1 - predp_1))
+```
+
+#13.7 Building a logistic regression model: wells in Bangladesh
+```{r 13.7}
+wells <- here("..", "Arsenic", "data", "wells.csv")
+wells <- read.csv(wells)
+wells
+
+fit_1 <- stan_glm(switch ~ dist, family=binomial(link="logit"), data=wells)
+wells$dist100 <- wells$dist/100
+fit_2 <- stan_glm(switch ~ dist100, family=binomial(link="logit"), data=wells)
+
+jitter_binary <- function(a, jitt=0.05){
+  ifelse(a==0, runif(length(a), 0, jitt), runif(length(a), 1 - jitt, 1))
+}
+
+wells$switch_jitter <- jitter_binary(wells$switch)
+plot(wells$dist, wells$switch_jitter)
+curve(invlogit(coef(fit_1)[1] + coef(fit_1)[2]*x), add=TRUE)
+
+fit_3 <- stan_glm(switch ~ dist100 + arsenic, family=binomial(link="logit"), data=wells)
+
+loo_fit_2 <- loo(fit_2)
+loo_fit_3 <- loo(fit_3)
+loo_compare(loo_fit_2, loo_fit_3)
+
+plot(wells$dist, wells$switch_jitter, xlim=c(0,max(wells$dist)))
+curve(invlogit(cbind(1, x/100, 0.5) %*% coef(fit_3)), add=TRUE)
+curve(invlogit(cbind(1, x/100, 1.0) %*% coef(fit_3)), add=TRUE)
+
+plot(wells$arsenic, wells$switch_jitter, xlim=c(0,max(wells$arsenic)))
+curve(invlogit(cbind(1, 0, x) %*% coef(fit_3)), add=TRUE)
+curve(invlogit(cbind(1,.5, x) %*% coef(fit_3)), add=TRUE)
+```
