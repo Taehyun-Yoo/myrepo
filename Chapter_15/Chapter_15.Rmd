@@ -17,6 +17,7 @@ library("brms")
 library("arm")
 library("loo")
 library("MASS")
+library("bayesplot")
 ```
 
 #15.2 Poisson and negative binomial regression
